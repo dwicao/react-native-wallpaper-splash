@@ -42,10 +42,8 @@ export default class SplashWall extends Component {
 
   componentWillMount() {
     this.imagePanResponder = PanResponder.create({
-      onStartShouldSetPanResponder: this.handleStartShouldSetPanResponder,
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
       onPanResponderGrant: this.handlePanResponderGrant,
-      onPanResponderRelease: this.handlePanResponderEnd,
-      onPanResponderTerminate: this.handlePanResponderEnd
     });
   }
 
@@ -57,10 +55,10 @@ export default class SplashWall extends Component {
     const {wallsJSON} = this.state;
     const currentWall = wallsJSON[this.currentWallIndex];
     const currentWallURL = `https://unsplash.it/${DEVICE_WIDTH}/${DEVICE_HEIGHT}?image=${currentWall.id}`;
-   // console.log('currentWallURL', currentWallURL);
+    console.log('currentWallURL', currentWallURL);
 
     // IDK but this cause the App crashed on iOS simulator 
-    //CameraRoll.saveToCameraRoll(currentWallURL);
+    // CameraRoll.saveToCameraRoll(currentWallURL);
   }
 
   onMomentumScrollEnd(e, state, context) {
@@ -76,11 +74,7 @@ export default class SplashWall extends Component {
     return ( dt < DOUBLE_TAP_DELAY && distance(prevTouchX, prevTouchY, x0, y0) < DOUBLE_TAP_RADIUS );
   }
 
-  handleStartShouldSetPanResponder(e, gestureState) {
-    return true;
-  }
-
-  handlePanResponderGrant(e, gestureState) {
+  handlePanResponderGrant(evt, gestureState) {
     const currentTouchTimeStamp = Date.now();
 
     if ( this.isDoubleTap(currentTouchTimeStamp, gestureState) ) {
@@ -94,14 +88,10 @@ export default class SplashWall extends Component {
     };
  }
 
-  handlePanResponderEnd(e, gestureState) {
-   // console.log('FInger pulled from the image');
-  }
-
   fetchWallsJSON() {
-    const url = `https://unsplash.it/list`;
+    const URL = `https://unsplash.it/list`;
 
-    fetch(url)
+    fetch(URL)
       .then(response => response.json())
       .then(jsonData => {
         const randomIds = uniqueRandomNumbers(5, 0, jsonData.length);
@@ -134,6 +124,7 @@ export default class SplashWall extends Component {
           activeDot={<View style={{backgroundColor: '#FFF', width: 13, height: 13, borderRadius: 7, marginLeft: 7, marginRight: 7 }} />}
           loop={false}
           onMomentumScrollEnd={this.onMomentumScrollEnd}
+          {...this.imagePanResponder.panHandlers}
         >
           {wallsJSON.map((wallpaper, index) => (
             <View style={{flex: 1}} key={index}>
@@ -145,8 +136,6 @@ export default class SplashWall extends Component {
                   size: size,
                   thickness: 7
                 }}
-                // IDK but this cause swipe be very slow
-                //{...this.imagePanResponder.panHandlers}
               />
               <Text style={styles.label}>Photo by</Text>
               <Text style={styles.label_authorName}>{wallpaper.author}</Text>
