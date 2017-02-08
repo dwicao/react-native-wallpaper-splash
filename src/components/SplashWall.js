@@ -8,6 +8,7 @@ import {
   PanResponder,
   CameraRoll,
   AlertIOS,
+  Platform,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import RNFetchBlob from 'react-native-fetch-blob';
@@ -124,6 +125,7 @@ export default class SplashWall extends Component {
 
   renderResult() {
     const { wallsJSON, isLoading } = this.state;
+    const size = (Platform.OS === 'ios') ? 0 : 60; 
 
     if ( !isLoading ) {
       return (
@@ -140,7 +142,7 @@ export default class SplashWall extends Component {
                 style={styles.wallpaperImage}
                 indicatorProps={{
                   color: '#ffffff',
-                  size: 60,
+                  size: size,
                   thickness: 7
                 }}
                 // IDK but this cause swipe be very slow
